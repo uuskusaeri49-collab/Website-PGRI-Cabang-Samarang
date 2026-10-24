@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - PGRI Cabang Samarang</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --pgri-blue: #004a99;
+            --pgri-accent: #ffc107;
+            --light-bg: #f8f9fa;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--light-bg); }
+        .navbar { background-color: var(--pgri-blue); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .navbar-brand, .nav-link { color: #ffffff !important; }
+        .nav-link:hover { color: var(--pgri-accent) !important; }
+        .dropdown-menu { border: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .dropdown-item:hover { background-color: #f1f3f5; color: var(--pgri-blue); font-weight: 500; }
+        
+        .section-title {
+            color: var(--pgri-blue); font-weight: bold; margin-bottom: 20px; text-transform: uppercase; position: relative; padding-bottom: 10px;
+        }
+        .section-title::after { content: ''; position: absolute; left: 0; bottom: 0; width: 50px; height: 3px; background-color: var(--pgri-accent); }
+        .text-center .section-title::after { left: 50%; transform: translateX(-50%); }
+        .card-custom { border: none; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.3s ease; }
+        .card-custom:hover { transform: translateY(-5px); }
+        
+        footer { background-color: #212529; color: #adb5bd; padding: 50px 0 20px; }
+        footer a { color: #adb5bd; text-decoration: none; }
+        footer a:hover { color: white; }
+        .social-icons a { font-size: 1.5rem; margin-right: 15px; color: white; }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGASI -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="index.html">
+                <img src="logo_pgri.png" alt="Logo PGRI" style="height: 40px; margin-right: 10px;">
+                PGRI SAMARANG
+            </a>
+            <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Beranda</a></li>
+                    
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown">
+                            Profil
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="profil.html#sejarah">Sejarah Singkat</a></li>
+                            <li><a class="dropdown-item" href="profil.html#pengurus">Pengurus</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="profil.html#sekolah-anggota">Daftar Sekolah Anggota</a></li>
+                        </ul>
+                    </li>
+                    
+                    <li class="nav-item"><a class="nav-link" href="keanggotaan.html">Keanggotaan</a></li>
+                    <li class="nav-item"><a class="nav-link" href="berita.html">Berita & Karya</a></li>
+                    <li class="nav-item"><a class="nav-link" href="unduhan.html">Unduhan</a></li>
+                    <li class="nav-item"><a class="nav-link" href="aspirasi.html">Aspirasi</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HEADER HALAMAN PROFIL -->
+    <div class="bg-primary text-white py-5" style="background: linear-gradient(135deg, #004a99 0%, #007bff 100%);">
+        <div class="container text-center">
+            <h1 class="display-5 fw-bold">Profil Organisasi</h1>
+            <p class="lead mb-0">Mengenal lebih dekat PGRI Cabang Samarang</p>
+        </div>
+    </div>
+
+    <!-- VISI & MISI -->
+    <section class="container py-5 mt-3">
+        <div class="text-center mb-5">
+            <h2 class="section-title d-inline-block">Visi & Misi</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card card-custom h-100 p-4 bg-primary text-white">
+                    <h3 class="text-center mb-4"><i class="fas fa-eye fa-2x mb-2 d-block text-warning"></i> VISI</h3>
+                    <p class="text-center fs-5">"Terwujudnya PGRI Cabang Samarang yang kuat, independen, dan profesional dalam memajukan pendidikan serta menyejahterakan guru."</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-custom h-100 p-4 bg-white border">
+                    <h3 class="text-center mb-4" style="color: var(--pgri-blue);"><i class="fas fa-bullseye fa-2x mb-2 d-block"></i> MISI</h3>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item border-0"><i class="fas fa-check text-success me-2"></i> Meningkatkan profesionalisme guru melalui pelatihan.</li>
+                        <li class="list-group-item border-0"><i class="fas fa-check text-success me-2"></i> Melindungi hak dan memberikan bantuan hukum bagi anggota.</li>
+                        <li class="list-group-item border-0"><i class="fas fa-check text-success me-2"></i> Membangun kerjasama solid antar sekolah mitra dan ranting.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEJARAH SINGKAT -->
+    <section id="sejarah" class="container py-5 border-top">
+        <div class="row align-items-center">
+            <div class="col-lg-5 mb-4 mb-lg-0 text-center">
+                <img src="logo-pgri.png" alt="Logo Sejarah" class="img-fluid" style="max-height: 250px; opacity: 0.8;">
+            </div>
+            <div class="col-lg-7">
+                <h2 class="section-title">Sejarah Singkat</h2>
+                <p class="lead text-dark">PGRI Cabang Samarang didirikan dengan semangat persatuan untuk memajukan kualitas pendidikan dan kesejahteraan guru di wilayah kecamatan Samarang.</p>
+                <p class="text-muted">Sejak awal berdirinya, organisasi ini telah menjadi wadah berkumpulnya para pendidik yang berdedikasi tinggi. Melalui berbagai program pelatihan dan advokasi, PGRI Samarang terus berupaya menjawab tantangan dunia pendidikan yang semakin kompleks.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SUSUNAN PENGURUS -->
+    <section id="pengurus" class="py-5 bg-white border-top border-bottom">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">Susunan Pengurus</h2>
+            <div class="row text-center g-4 justify-content-center">
+                
+                <div class="col-md-3 col-sm-6">
+                    <div class="card card-custom p-3 border-0">
+                        <img src="ketua.jpg" class="rounded-circle mx-auto mb-3 shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
+                        <h6 class="fw-bold mb-1">ARIEF FAUZI MANSUR, S.Pd.</h6>
+                        <span class="badge bg-primary">Ketua Cabang PGRI Samarang</span>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 col-sm-6">
+                    <div class="card card-custom p-3 border-0">
+                        <img src="https://placehold.co/150x150/eeeeee/666666?text=Foto" class="rounded-circle mx-auto mb-3 shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
+                        <h6 class="fw-bold mb-1">Nama Wakil Ketua</h6>
+                        <span class="badge bg-info text-dark">Wakil Ketua</span>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="card card-custom p-3 border-0">
+                        <img src="https://placehold.co/150x150/eeeeee/666666?text=Foto" class="rounded-circle mx-auto mb-3 shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
+                        <h6 class="fw-bold mb-1">Nama Sekretaris</h6>
+                        <span class="badge bg-success">Sekretaris</span>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 col-sm-6">
+                    <div class="card card-custom p-3 border-0">
+                        <img src="https://placehold.co/150x150/eeeeee/666666?text=Foto" class="rounded-circle mx-auto mb-3 shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
+                        <h6 class="fw-bold mb-1">Nama Bendahara</h6>
+                        <span class="badge bg-warning text-dark">Bendahara</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- DAFTAR SEKOLAH ANGGOTA -->
+    <section id="sekolah-anggota" class="container py-5 mb-4">
+        <h2 class="section-title text-center mb-4">Daftar Sekolah Mitra & Ranting</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="table-responsive shadow-sm rounded">
+                    <table class="table table-bordered table-striped table-hover mb-0">
+                        <thead class="table-primary text-center align-middle">
+                            <tr>
+                                <th width="5%">No</th>
+                                <th>Nama Sekolah / Instansi</th>
+                                <th width="15%">Tingkat</th>
+                                <th width="30%">Kepala Sekolah</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="text-center">1</td><td class="fw-bold">SDN 1 Samarang</td><td class="text-center"><span class="badge bg-danger">SD</span></td><td>Bpk. Ahmad, S.Pd.</td></tr>
+                            <tr><td class="text-center">2</td><td class="fw-bold">SMPN 1 Samarang</td><td class="text-center"><span class="badge bg-primary">SMP</span></td><td>Ibu Siti, M.Pd.</td></tr>
+                            <tr><td class="text-center">3</td><td class="fw-bold">SMAN 1 Samarang</td><td class="text-center"><span class="badge bg-info text-dark">SMA</span></td><td>Bpk. Ridwan, M.Si.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="pt-5 mt-5 border-top">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white fw-bold mb-3"><i class="fas fa-book-reader me-2"></i> PGRI CABANG SAMARANG</h5>
+                    <p>Organisasi profesi yang mewadahi para guru dan tenaga kependidikan di wilayah Kecamatan Samarang, berdedikasi untuk kemajuan pendidikan Indonesia.</p>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white fw-bold mb-3">Kontak & Sekretariat</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> Gedung PGRI, Jl. Pendidikan No. 1, Samarang</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> info@pgrisamarang.or.id</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i> (0262) 1234567</li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white fw-bold mb-3">Ikuti Kami</h5>
+                    <p>Dapatkan update terbaru melalui media sosial resmi kami.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="border-secondary">
+            <div class="text-center pb-3">
+                <small>&copy; 2024 PGRI Cabang Samarang. All Rights Reserved.</small>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
