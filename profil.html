@@ -443,15 +443,16 @@
     <section id="sekolah-anggota" class="container py-5 mb-4">
         <h2 class="section-title text-center mb-4">Daftar Sekolah Mitra & Ranting</h2>
         <div class="row justify-content-center">
-            <div class="col-lg-12"> <!-- Diperlebar jadi col-lg-12 agar tabelnya muat -->
+            <div class="col-lg-12">
                 <div class="table-responsive shadow-sm rounded">
                     <table class="table table-bordered table-striped table-hover mb-0">
                         <thead class="table-primary text-center align-middle">
                             <tr>
                                 <th width="5%">No</th>
                                 <th width="15%">Nama Ranting</th>
-                                <th width="15%">Tingkat</th>
-                                <th width="30%">Sekolah Naungan</th>
+                                <th width="10%">Tingkat</th>
+                                <th width="25%">Sekolah Naungan</th>
+                                <th width="10%">Jml Sekolah</th>
                                 <th width="10%">Jml Anggota</th>
                                 <th width="25%">Ketua Ranting</th>
                             </tr>
@@ -459,7 +460,7 @@
                         <tbody id="tabelRanting">
                             <!-- Loading Animasi -->
                             <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">
+                                <td colspan="7" class="text-center py-4 text-muted">
                                     <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
                                     <p class="mb-0">Sedang merekap data ranting dari database...</p>
                                 </td>
@@ -549,21 +550,25 @@
                     // 1. Tambah jumlah anggota
                     rekapRanting[namaRanting].jumlahAnggota++;
 
-                    // 2. Kumpulkan nama sekolah
+                    // 2. Kumpulkan nama sekolah & Atasi Duplikat
                     if (data.sekolah && data.sekolah.trim() !== "") {
-                        let namaSekolah = data.sekolah.trim();
+                        let namaSekolah = data.sekolah.trim().toUpperCase();
                         rekapRanting[namaRanting].sekolah.add(namaSekolah);
 
-                        // 3. Deteksi Tingkat dari nama sekolahnya
-                        let sekBesar = namaSekolah.toUpperCase();
-                        if (sekBesar.includes("SD") || sekBesar.includes("MIN")) rekapRanting[namaRanting].tingkat.add("SD");
-                        if (sekBesar.includes("SMP") || sekBesar.includes("MTS")) rekapRanting[namaRanting].tingkat.add("SMP");
-                        if (sekBesar.includes("SMA") || sekBesar.includes("SMK") || sekBesar.includes("MA")) rekapRanting[namaRanting].tingkat.add("SMA");
-                        if (sekBesar.includes("TK") || sekBesar.includes("PAUD") || sekBesar.includes("RA")) rekapRanting[namaRanting].tingkat.add("TK");
+                        // JURUS 2 (BARU): Pisahkan nama sekolah jadi kata-kata agar singkatan tidak tertukar
+                        // Pemecahan menggunakan spasi, koma, titik, atau strip
+                        let kataKata = namaSekolah.split(/[\s,.-]+/); 
+                        
+                        kataKata.forEach(kata => {
+                            if (["SD", "SDN", "SDIT", "SDI", "MI", "MIS"].includes(kata)) rekapRanting[namaRanting].tingkat.add("SD");
+                            if (["SMP", "SMPN", "SMPIT", "SMPI", "MTS", "MTSN", "MTSS"].includes(kata)) rekapRanting[namaRanting].tingkat.add("SMP");
+                            if (["SMA", "SMAN", "SMK", "SMKN", "MA", "MAN", "MAS"].includes(kata)) rekapRanting[namaRanting].tingkat.add("SMA");
+                            if (["TK", "PAUD", "RA", "KOBER", "TPA", "SPS", "TKIT"].includes(kata)) rekapRanting[namaRanting].tingkat.add("TK");
+                        });
                     }
 
-                    // 4. Cari siapa Ketuanya (Cek apakah jabatannya ada kata "Ketua")
-                    if (data.jabatan && data.jabatan.toLowerCase().includes("ketua")) {
+                    // JURUS 3: Cari Ketua Ranting (Filter Super Ketat)
+                    if (data.jabatan && data.jabatan.toLowerCase().includes("ketua ranting")) {
                         rekapRanting[namaRanting].ketua = data.nama;
                     }
                 });
@@ -571,13 +576,11 @@
                 // Bersihkan Loading
                 tbody.innerHTML = "";
 
-                // Tampilkan data ke tabel
                 let nomor = 1;
-                // Object.keys() untuk mengambil nama-nama ranting dan diurutkan sesuai abjad (A-Z)
                 let namaNamaRanting = Object.keys(rekapRanting).sort();
 
                 if (namaNamaRanting.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center">Belum ada data anggota di database.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center">Belum ada data anggota di database.</td></tr>';
                     return;
                 }
 
@@ -604,6 +607,7 @@
                             <td class="fw-bold align-middle">${ranting}</td>
                             <td class="text-center align-middle">${htmlTingkat}</td>
                             <td class="align-middle small">${daftarSekolah}</td>
+                            <td class="text-center align-middle"><span class="badge bg-secondary fs-6">${info.sekolah.size}</span></td>
                             <td class="text-center align-middle"><span class="badge bg-success fs-6">${info.jumlahAnggota}</span></td>
                             <td class="align-middle">${info.ketua}</td>
                         </tr>
@@ -613,7 +617,7 @@
 
             } catch (error) {
                 console.error("Gagal merekap ranting:", error);
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Gagal memuat data. Periksa koneksi.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Gagal memuat data. Periksa koneksi.</td></tr>';
             }
         }
 
