@@ -28,11 +28,20 @@
         footer a:hover { color: white; }
         .social-icons a { font-size: 1.5rem; margin-right: 15px; color: white; }
         
+        /* CSS Untuk Konten Artikel (Mendukung Rich Text dari Admin) */
         .article-content {
             font-size: 1.1rem;
             line-height: 1.8;
             color: #444;
-            white-space: pre-wrap; 
+        }
+        .article-content p { margin-bottom: 1rem; }
+        .article-content a { color: var(--pgri-blue); text-decoration: underline; }
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 15px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         
         /* CSS Tambahan untuk Kartu Rekomendasi */
@@ -52,6 +61,7 @@
                 <!-- Ganti nama file logo sesuai yang Bos miliki -->
                 <img src="logo_pgri.png" alt="Logo PGRI" style="height: 45px; margin-right: 10px;">
                 PGRI CABANG KEC. SAMARANG
+            </a>
             <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -110,7 +120,7 @@
         <div class="container">
             <div class="row mb-4">
                 <div class="col-lg-4 mb-4">
-					<h5 class="text-white fw-bold mb-3"> <img src="logo_pgri.png" style="height: 28px; margin-right: 5px;"> PGRI CABANG KEC. SAMARANG</h5>
+					<h5 class="text-white fw-bold mb-3"> <img src="logo_pgri.png" style="height: 28px; margin-right: 5px;" alt="Logo"> PGRI CABANG KEC. SAMARANG</h5>
                     <p>Organisasi profesi yang mewadahi para guru dan tenaga kependidikan di wilayah Kecamatan Samarang, berdedikasi untuk kemajuan pendidikan Indonesia.</p>
                 </div>
                 <div class="col-lg-4 mb-4">
@@ -142,11 +152,9 @@
     <!-- Tambahkan Script Bootstrap agar menu dropdown berfungsi -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Script Firebase -->
-    <s<!-- Script Firebase -->
+    <!-- Script Firebase (Typo sudah diperbaiki) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        // KITA TAMBAHKAN collection, getDocs, query, orderBy, limit DI SINI BOS
         import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -170,7 +178,7 @@
 
         async function muatArtikelPenuh() {
             if (!idArtikel) {
-                wadahArtikel.innerHTML = '<div class="alert alert-danger">Artikel tidak ditemukan. Link mungkin rusak atau tidak lengkap.</div>';
+                wadahArtikel.innerHTML = '<div class="alert alert-danger shadow-sm">Silakan pilih artikel dari menu <a href="berita.html">Berita & Karya</a>.</div>';
                 return;
             }
 
@@ -182,9 +190,9 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     
-                    // Format tanggal (kalau ada)
+                    // Format tanggal yang aman dari error (Safe Check)
                     let tanggalPosting = "Baru saja";
-                    if(data.tanggalDibuat) {
+                    if (data.tanggalDibuat && typeof data.tanggalDibuat.toDate === 'function') {
                         const dateObj = data.tanggalDibuat.toDate();
                         tanggalPosting = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
                     }
@@ -197,11 +205,11 @@
 
                     // Tampilkan ke layar
                     wadahArtikel.innerHTML = `
-                        <span class="badge bg-primary mb-3"><i class="fas fa-tag me-1"></i> ${data.kategori}</span>
+                        <span class="badge bg-primary mb-3 shadow-sm"><i class="fas fa-tag me-1"></i> ${data.kategori}</span>
                         <h1 class="article-title mb-3">${data.judul}</h1>
                         
                         <div class="d-flex align-items-center mb-4 pb-3 border-bottom text-muted">
-                            <i class="fas fa-user-circle fa-2x me-2"></i>
+                            <i class="fas fa-user-circle fa-2x me-2 text-primary"></i>
                             <div>
                                 <div class="fw-bold text-dark">${data.penulis}</div>
                                 <small><i class="far fa-calendar-alt me-1"></i> Dipublikasikan pada ${tanggalPosting}</small>
@@ -213,9 +221,9 @@
                         <div class="article-content">${data.isi}</div>
                         
                         <div class="mt-5 pt-4 border-top">
-                            <h6 class="fw-bold">Bagikan Artikel Ini:</h6>
-                            <button class="btn btn-sm btn-outline-success me-2" onclick="alert('Fitur bagikan ke WA akan segera aktif!')"><i class="fab fa-whatsapp me-1"></i> WhatsApp</button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="alert('Fitur bagikan ke FB akan segera aktif!')"><i class="fab fa-facebook me-1"></i> Facebook</button>
+                            <h6 class="fw-bold mb-3">Bagikan Artikel Ini:</h6>
+                            <button class="btn btn-sm btn-outline-success me-2 rounded-pill px-3" onclick="alert('Fitur bagikan ke WA akan segera aktif!')"><i class="fab fa-whatsapp me-1"></i> WhatsApp</button>
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="alert('Fitur bagikan ke FB akan segera aktif!')"><i class="fab fa-facebook me-1"></i> Facebook</button>
                         </div>
                     `;
                     
@@ -228,7 +236,7 @@
                 }
             } catch (error) {
                 console.error("Error mengambil artikel:", error);
-                wadahArtikel.innerHTML = '<div class="alert alert-danger">Gagal memuat artikel. Coba muat ulang halaman. atau kuota habis.</div>';
+                wadahArtikel.innerHTML = '<div class="alert alert-danger">Gagal memuat artikel. Coba muat ulang halaman atau kuota habis.</div>';
             }
         }
 
@@ -275,7 +283,7 @@
         }
 
         // Jalankan fungsi
-        muatArtikelPenuh();
+        document.addEventListener("DOMContentLoaded", muatArtikelPenuh);
     </script>
 </body>
 </html>
