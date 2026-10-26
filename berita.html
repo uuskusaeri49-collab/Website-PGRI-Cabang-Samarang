@@ -72,10 +72,12 @@
     <div class="container py-5">
         <!-- Filter Kategori (Hiasan UI) -->
         <div class="d-flex justify-content-center mb-5">
-            <div class="btn-group shadow-sm" role="group">
-                <button type="button" class="btn btn-primary active">Semua Berita</button>
-                <button type="button" class="btn btn-outline-primary bg-white">Berita Kegiatan</button>
-                <button type="button" class="btn btn-outline-primary bg-white">Pojok Karya</button>
+            <div class="btn-group shadow-sm" role="group" id="grupTombolFilter">
+                <!-- Kita tambahkan atribut data-filter agar mesin tahu ini kategori apa -->
+                <button type="button" class="btn btn-primary active" data-filter="Semua">Semua Berita</button>
+                <button type="button" class="btn btn-outline-primary bg-white" data-filter="Berita Kegiatan">Berita Kegiatan</button>
+                <button type="button" class="btn btn-outline-primary bg-white" data-filter="Pojok Karya">Pojok Karya</button>
+                <button type="button" class="btn btn-outline-primary bg-white" data-filter="Pengumuman">Pengumuman</button>
             </div>
         </div>
 
@@ -135,7 +137,6 @@
     <!-- FIREBASE SCRIPT UNTUK MENARIK SEMUA DATA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        // Bedanya dengan index.html, di sini kita tidak pakai 'limit()' supaya semua berita ketarik
         import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -150,61 +151,112 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        async function muatSemuaBerita() {
-            const wadah = document.getElementById("wadahSemuaBerita");
+        // VARIABEL GLOBAL: Simpan semua data di sini biar gak bolak-balik Firebase (Hemat Kuota)
+        let semuaDataBeritaMentah = [];
+        const wadah = document.getElementById("wadahSemuaBerita");
+
+        // FUNGSI 1: Tarik data dari server (Hanya dipanggil 1 kali saat buka web)
+        async function tarikDataDariServer() {
             try {
-                // Tarik SEMUA data dari koleksi "postingan", urutkan dari yang terbaru
                 const q = query(collection(db, "postingan"), orderBy("tanggalDibuat", "desc"));
                 const querySnapshot = await getDocs(q);
                 
-                wadah.innerHTML = ""; // Bersihkan loading
-                
                 if (querySnapshot.empty) {
-                    wadah.innerHTML = '<div class="col-12"><div class="alert alert-info">Belum ada berita atau publikasi yang diterbitkan.</div></div>';
+                    wadah.innerHTML = '<div class="col-12"><div class="alert alert-info text-center">Belum ada publikasi.</div></div>';
                     return;
                 }
 
+                // Masukkan semua data ke variabel penampung
+                semuaDataBeritaMentah = [];
                 querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    
-                    let badgeColor = "bg-primary";
-                    let icon = "fa-newspaper";
-                    if (data.kategori === "Pojok Karya") { badgeColor = "bg-info text-dark"; icon = "fa-pen-nib"; } 
-                    else if (data.kategori === "Pengumuman") { badgeColor = "bg-warning text-dark"; icon = "fa-bullhorn"; }
-
-                    // Batasi cuplikan teks agar seragam tingginya
-                    const isiPendek = data.isi.length > 120 ? data.isi.substring(0, 120) + "..." : data.isi;
-
-                    const elemenGambar = data.gambar 
-                        ? `<img src="${data.gambar}" class="card-img-top" alt="Foto" style="height: 220px; object-fit: cover;">`
-                        : `<img src="https://placehold.co/600x400/eeeeee/004a99?text=PGRI+Samarang" class="card-img-top" alt="Default" style="height: 220px; object-fit: cover;">`;
-
-                    // Desain Grid (tiap baris isi 3 kartu kalau di laptop)
-                    const htmlCard = `
-                        <div class="col-lg-4 col-md-6 mb-4">
-                            <div class="card card-custom h-100 shadow-sm border-0 overflow-hidden">
-                                ${elemenGambar}
-                                <div class="card-body d-flex flex-column">
-                                    <div class="mb-2 mt-1">
-                                        <span class="badge ${badgeColor}"><i class="fas ${icon} me-1"></i> ${data.kategori}</span>
-                                    </div>
-                                    <h5 class="card-title fw-bold mt-1">${data.judul}</h5>
-                                    <p class="text-muted small mb-3"><i class="fas fa-user-edit me-1"></i> ${data.penulis}</p>
-                                    <p class="card-text text-muted" style="font-size:0.95rem;">${isiPendek}</p>
-                                    <a href="baca.html?id=${doc.id}" class="btn btn-outline-primary mt-auto align-self-start w-100"><i class="fas fa-book-open me-1"></i> Baca Selengkapnya</a>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    wadah.innerHTML += htmlCard;
+                    let data = doc.data();
+                    data.id = doc.id; // Simpan ID untuk link baca
+                    semuaDataBeritaMentah.push(data);
                 });
+
+                // Tampilkan semua berita di awal
+                tampilkanBerita("Semua");
+
             } catch (error) {
                 console.error("Error: ", error);
                 wadah.innerHTML = '<div class="col-12"><div class="alert alert-danger">Gagal memuat berita dari server.</div></div>';
             }
         }
 
-        document.addEventListener("DOMContentLoaded", muatSemuaBerita);
+        // FUNGSI 2: Menyaring dan Menampilkan ke Layar
+        function tampilkanBerita(kategoriPilihan) {
+            wadah.innerHTML = ""; // Bersihkan layar dulu
+            
+            // Proses penyaringan (Filter)
+            let beritaDisaring = [];
+            if (kategoriPilihan === "Semua") {
+                beritaDisaring = semuaDataBeritaMentah;
+            } else {
+                // Hanya ambil berita yang kategorinya sama persis dengan tombol yang diklik
+                beritaDisaring = semuaDataBeritaMentah.filter(berita => berita.kategori === kategoriPilihan);
+            }
+
+            // Kalau setelah disaring ternyata kosong
+            if (beritaDisaring.length === 0) {
+                wadah.innerHTML = `<div class="col-12"><div class="alert alert-secondary text-center shadow-sm">Belum ada artikel untuk kategori <b>${kategoriPilihan}</b>.</div></div>`;
+                return;
+            }
+
+            // Tampilkan yang sudah disaring
+            beritaDisaring.forEach((data) => {
+                let badgeColor = "bg-primary";
+                let icon = "fa-newspaper";
+                if (data.kategori === "Pojok Karya") { badgeColor = "bg-info text-dark"; icon = "fa-pen-nib"; } 
+                else if (data.kategori === "Pengumuman") { badgeColor = "bg-warning text-dark"; icon = "fa-bullhorn"; }
+
+                const isiPendek = data.isi.length > 120 ? data.isi.substring(0, 120) + "..." : data.isi;
+                const elemenGambar = data.gambar 
+                    ? `<img src="${data.gambar}" class="card-img-top" alt="Foto" style="height: 220px; object-fit: cover;">`
+                    : `<img src="https://placehold.co/600x400/eeeeee/004a99?text=PGRI+Samarang" class="card-img-top" alt="Default" style="height: 220px; object-fit: cover;">`;
+
+                const htmlCard = `
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card card-custom h-100 shadow-sm border-0 overflow-hidden">
+                            ${elemenGambar}
+                            <div class="card-body d-flex flex-column">
+                                <div class="mb-2 mt-1">
+                                    <span class="badge ${badgeColor}"><i class="fas ${icon} me-1"></i> ${data.kategori}</span>
+                                </div>
+                                <h5 class="card-title fw-bold mt-1">${data.judul}</h5>
+                                <p class="text-muted small mb-3"><i class="fas fa-user-edit me-1"></i> ${data.penulis}</p>
+                                <p class="card-text text-muted" style="font-size:0.95rem;">${isiPendek}</p>
+                                <a href="baca.html?id=${data.id}" class="btn btn-outline-primary mt-auto align-self-start w-100"><i class="fas fa-book-open me-1"></i> Baca Selengkapnya</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                wadah.innerHTML += htmlCard;
+            });
+        }
+
+        // FUNGSI 3: Logika Klik Tombol Filter
+        const tombolFilter = document.querySelectorAll("#grupTombolFilter button");
+        
+        tombolFilter.forEach(tombol => {
+            tombol.addEventListener("click", function() {
+                // 1. Ubah warna semua tombol jadi putih (tidak aktif)
+                tombolFilter.forEach(btn => {
+                    btn.classList.remove("btn-primary", "active");
+                    btn.classList.add("btn-outline-primary", "bg-white");
+                });
+                
+                // 2. Ubah warna tombol yang ditekan jadi biru (aktif)
+                this.classList.remove("btn-outline-primary", "bg-white");
+                this.classList.add("btn-primary", "active");
+                
+                // 3. Ambil nama kategori dan saring datanya
+                const kategoriYangDipilih = this.getAttribute("data-filter");
+                tampilkanBerita(kategoriYangDipilih);
+            });
+        });
+
+        // Jalankan saat web pertama kali dibuka
+        document.addEventListener("DOMContentLoaded", tarikDataDariServer);
     </script>
 </body>
 </html>
