@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baca Artikel - PGRI Cabang Samarang</title>
-	<!-- INI DIA KODE UNTUK MENGGANTI BOLA DUNIA JADI LOGO PGRI -->
-    <link rel="icon" type="image/png" href="logo_pgri.png">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -30,26 +28,19 @@
         footer a:hover { color: white; }
         .social-icons a { font-size: 1.5rem; margin-right: 15px; color: white; }
         
-        .article-container {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            margin-top: 40px;
-            margin-bottom: 40px;
-            min-height: 50vh;
-        }
-        .article-title {
-            color: var(--pgri-blue);
-            font-weight: bold;
-        }
-        /* white-space pre-wrap bikin Enter (paragraf) yang Bos ketik di Admin tetap terbaca */
         .article-content {
             font-size: 1.1rem;
             line-height: 1.8;
             color: #444;
             white-space: pre-wrap; 
         }
+        
+        /* CSS Tambahan untuk Kartu Rekomendasi */
+        .rek-card { transition: transform 0.3s; border-radius: 10px; overflow: hidden; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .rek-card:hover { transform: translateY(-5px); }
+        .rek-title { font-size: 1rem; font-weight: bold; line-height: 1.4; }
+        .rek-title a { color: var(--pgri-blue); text-decoration: none; }
+        .rek-title a:hover { color: var(--pgri-accent); }
     </style>
 </head>
 <body>
@@ -100,6 +91,16 @@
                         <h5>Sedang mengambil data artikel...</h5>
                     </div>
                 </div>
+
+                <!-- INI TAMBAHAN WADAH ARTIKEL LAINNYA (Di bawah artikel) -->
+                <div class="mt-5 mb-5">
+                    <h4 class="fw-bold mb-4 border-bottom border-2 border-primary pb-2 d-inline-block">Baca Artikel Lainnya</h4>
+                    <div class="row" id="wadahArtikelLainnya">
+                        <!-- Animasi loading kecil -->
+                        <div class="col-12 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Mencari rekomendasi...</div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -142,10 +143,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Script Firebase -->
+    <s<!-- Script Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        // Kita butuh getDoc dan doc untuk mengambil 1 data spesifik berdasarkan ID
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        // KITA TAMBAHKAN collection, getDocs, query, orderBy, limit DI SINI BOS
+        import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBy2KzlKK1L4KmOGNiBpy-tZcJAc9ETApM",
@@ -164,6 +166,7 @@
         const idArtikel = urlParams.get('id');
         
         const wadahArtikel = document.getElementById("wadahArtikel");
+        const wadahArtikelLainnya = document.getElementById("wadahArtikelLainnya"); // Wadah rekomendasi
 
         async function muatArtikelPenuh() {
             if (!idArtikel) {
@@ -215,12 +218,59 @@
                             <button class="btn btn-sm btn-outline-primary" onclick="alert('Fitur bagikan ke FB akan segera aktif!')"><i class="fab fa-facebook me-1"></i> Facebook</button>
                         </div>
                     `;
+                    
+                    // SETELAH ARTIKEL UTAMA MUNCUL, PANGGIL FUNGSI ARTIKEL LAINNYA
+                    muatArtikelLainnya(idArtikel);
+
                 } else {
                     wadahArtikel.innerHTML = '<div class="alert alert-warning">Maaf, artikel ini sudah dihapus atau tidak tersedia.</div>';
+                    wadahArtikelLainnya.innerHTML = '';
                 }
             } catch (error) {
                 console.error("Error mengambil artikel:", error);
-                wadahArtikel.innerHTML = '<div class="alert alert-danger">Gagal memuat artikel. Coba muat ulang halaman.</div>';
+                wadahArtikel.innerHTML = '<div class="alert alert-danger">Gagal memuat artikel. Coba muat ulang halaman. atau kuota habis.</div>';
+            }
+        }
+
+        // FUNGSI BARU: MENARIK ARTIKEL REKOMENDASI
+        async function muatArtikelLainnya(idSaatIni) {
+            try {
+                // Tarik 4 artikel terbaru
+                const q = query(collection(db, "postingan"), orderBy("tanggalDibuat", "desc"), limit(4));
+                const snapshot = await getDocs(q);
+                
+                wadahArtikelLainnya.innerHTML = "";
+                let jumlahDitampilkan = 0;
+
+                snapshot.forEach(doc => {
+                    // Jangan tampilkan artikel yang sedang dibaca saat ini, dan batasi maksimal 3 kotak saja
+                    if(doc.id !== idSaatIni && jumlahDitampilkan < 3) {
+                        const data = doc.data();
+                        const gambarThumb = data.gambar ? data.gambar : "https://placehold.co/400x250/eeeeee/004a99?text=PGRI";
+                        
+                        const htmlCard = `
+                            <div class="col-md-4 mb-4">
+                                <div class="card rek-card h-100">
+                                    <img src="${gambarThumb}" class="card-img-top" style="height: 150px; object-fit: cover;" alt="Thumbnail">
+                                    <div class="card-body">
+                                        <span class="badge bg-secondary mb-2" style="font-size: 0.7rem;">${data.kategori}</span>
+                                        <h5 class="rek-title mb-0"><a href="baca.html?id=${doc.id}">${data.judul}</a></h5>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        wadahArtikelLainnya.innerHTML += htmlCard;
+                        jumlahDitampilkan++;
+                    }
+                });
+
+                if(jumlahDitampilkan === 0) {
+                    wadahArtikelLainnya.innerHTML = '<div class="col-12"><p class="text-muted">Belum ada artikel lainnya.</p></div>';
+                }
+
+            } catch (e) {
+                console.error("Gagal muat rekomendasi: ", e);
+                wadahArtikelLainnya.innerHTML = '';
             }
         }
 
