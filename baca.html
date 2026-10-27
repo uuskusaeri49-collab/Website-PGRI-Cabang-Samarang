@@ -49,9 +49,10 @@
     <!-- NAVIGASI UTAMA -->
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center" href="index.html">
-                <img src="logo-pgri.png" alt="Logo PGRI" style="height: 45px; margin-right: 10px;">
-                PGRI SAMARANG
+            <!-- Ini bagian yang diubah: Menambahkan logo dengan ukuran tinggi 45px -->
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="#">
+                <img src="logo_pgri.png" style="height: 45px; margin-right: 10px;">
+                PGRI CABANG KEC. SAMARANG
             </a>
             <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -59,18 +60,21 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="index.html">Beranda</a></li>
+                    
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown">Profil</a>
+                        <a class="nav-link dropdown-toggle" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown">
+                            Profil
+                        </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="profil.html#sejarah">Sejarah Singkat</a></li>
-                            <li><a class="dropdown-item" href="pengurus-cabang.html">Pengurus Cabang</a></li>
-                            <li><a class="dropdown-item" href="pengurus-ranting.html">Pengurus Ranting</a></li>
+                            <li><a class="dropdown-item" href="profil.html#pengurus">Pengurus</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="profil.html#sekolah-anggota">Daftar Sekolah Anggota</a></li>
                         </ul>
                     </li>
+                    
                     <li class="nav-item"><a class="nav-link" href="keanggotaan.html">Keanggotaan</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="berita.html">Berita & Karya</a></li>
+                    <li class="nav-item"><a class="nav-link" href="berita.html">Berita & Karya</a></li>
                     <li class="nav-item"><a class="nav-link" href="unduhan.html">Unduhan</a></li>
                     <li class="nav-item"><a class="nav-link" href="aspirasi.html">Aspirasi</a></li>
                 </ul>
@@ -103,9 +107,44 @@
     </div>
 
     <!-- FOOTER -->
-    <footer class="pt-5 border-top">
-        <div class="container text-center">
-            <p class="text-secondary small">&copy; 2026 PGRI Cabang Samarang. All Rights Reserved.</p>
+    <footer class="pt-5">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white fw-bold mb-3"> <img src="logo_pgri.png" style="height: 28px; margin-right: 5px;"> PGRI CABANG KEC. SAMARANG</h5>
+                    <p>Organisasi profesi yang mewadahi para guru dan tenaga kependidikan di wilayah Kecamatan Samarang, berdedikasi untuk kemajuan pendidikan Indonesia.</p>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white fw-bold mb-3">Kontak & Sekretariat</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> Gedung PGRI Pangwalungan Kp. Cicau Ds. Sukarasa Kec. Samarang Kab. Garut (44161)</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> pgrisamarang@gmail.com</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i> +62853-2034-7987</li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white fw-bold mb-3">Ikuti Kami</h5>
+                    <p>Dapatkan update terbaru melalui media sosial resmi kami.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="border-secondary">
+            <div class="row pb-3 align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <small>&copy; 2024 PGRI Cabang Samarang. All Rights Reserved.</small>
+                </div>
+                <!-- INI TAMBAHAN TOMBOL MASUK ADMIN YANG RAPI & TERSEMBUNYI DI FOOTER -->
+                <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
+                    <a href="login.html" class="text-light small text-decoration-none opacity-50" title="Khusus Pengurus / Admin" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5">
+                        <i class="fas fa-lock me-1"></i> Login Pengurus (Admin)
+                    </a>
+                </div>
+            </div>
         </div>
     </footer>
 
