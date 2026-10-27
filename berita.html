@@ -209,7 +209,10 @@
                 if (data.kategori === "Pojok Karya") { badgeColor = "bg-info text-dark"; icon = "fa-pen-nib"; } 
                 else if (data.kategori === "Pengumuman") { badgeColor = "bg-warning text-dark"; icon = "fa-bullhorn"; }
 
-                const isiPendek = data.isi.length > 120 ? data.isi.substring(0, 120) + "..." : data.isi;
+                // INI YANG DIPERBAIKI: Hapus kode HTML bawaan editor (gambar, heading) sebelum dipotong
+                let teksMentah = data.isi.replace(/<[^>]*>?/gm, ''); // Membersihkan tag HTML rahasia
+                const isiPendek = teksMentah.length > 120 ? teksMentah.substring(0, 120) + "..." : teksMentah;
+
                 const elemenGambar = data.gambar 
                     ? `<img src="${data.gambar}" class="card-img-top" alt="Foto" style="height: 220px; object-fit: cover;">`
                     : `<img src="https://placehold.co/600x400/eeeeee/004a99?text=PGRI+Samarang" class="card-img-top" alt="Default" style="height: 220px; object-fit: cover;">`;
