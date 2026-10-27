@@ -164,12 +164,14 @@
         </div>
     </footer>
 
+    <!-- Tambahkan Script Bootstrap agar menu dropdown berfungsi -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Script Firebase (Typo sudah diperbaiki) -->
+    <!-- Script Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        // KITA TAMBAHKAN addDoc, serverTimestamp, dan where UNTUK KOMENTAR
+        import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit, where, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBy2KzlKK1L4KmOGNiBpy-tZcJAc9ETApM",
@@ -183,12 +185,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Fungsi untuk menangkap ID dari link URL (misal: baca.html?id=123xyz)
         const urlParams = new URLSearchParams(window.location.search);
         const idArtikel = urlParams.get('id');
         
         const wadahArtikel = document.getElementById("wadahArtikel");
-        const wadahArtikelLainnya = document.getElementById("wadahArtikelLainnya"); // Wadah rekomendasi
+        const wadahArtikelLainnya = document.getElementById("wadahArtikelLainnya"); 
 
         async function muatArtikelPenuh() {
             if (!idArtikel) {
@@ -251,16 +252,41 @@
                         
                         <div class="mt-5 pt-4 border-top">
                             <h6 class="fw-bold mb-3">Bagikan Artikel Ini:</h6>
-                            <!-- TOMBOL WHATSAPP YANG SUDAH AKTIF -->
                             <button class="btn btn-sm btn-outline-success me-2 rounded-pill px-3" onclick="window.open('https://api.whatsapp.com/send?text=${encodeURIComponent(data.judul + ' | Baca selengkapnya di: ' + window.location.href)}', '_blank')"><i class="fab fa-whatsapp me-1"></i> WhatsApp</button>
-                            
-                            <!-- TOMBOL FACEBOOK YANG SUDAH AKTIF -->
                             <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}', '_blank')"><i class="fab fa-facebook me-1"></i> Facebook</button>
                         </div>
+
+                        <!-- ================= FITUR BARU: KOLOM KOMENTAR ================= -->
+                        <div class="mt-5 pt-4 border-top">
+                            <h4 class="fw-bold mb-4"><i class="fas fa-comments text-primary me-2"></i> Ruang Diskusi</h4>
+                            
+                            <!-- Daftar Komentar (Suntik dari Javascript) -->
+                            <div id="wadahKomentar" class="mb-4">
+                                <div class="text-center text-muted py-3"><i class="fas fa-spinner fa-spin me-2"></i>Memuat komentar...</div>
+                            </div>
+
+                            <!-- Form Tulis Komentar -->
+                            <div class="card card-custom bg-light border-0 p-4">
+                                <h6 class="fw-bold mb-3">Tinggalkan Jejak / Tanggapan</h6>
+                                <form id="formKomentar">
+                                    <div class="mb-3">
+                                        <input type="text" id="namaKomen" class="form-control" placeholder="Nama Anda (Boleh diisi dengan nama & asal sekolah)" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <textarea id="isiKomen" class="form-control" rows="3" placeholder="Tulis komentar membangun di sini..." required></textarea>
+                                    </div>
+                                    <button type="submit" id="btnKirimKomen" class="btn btn-primary fw-bold px-4">
+                                        <i class="fas fa-paper-plane me-1"></i> Kirim Tanggapan
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- ============================================================= -->
                     `;
                     
-                    // SETELAH ARTIKEL UTAMA MUNCUL, PANGGIL FUNGSI ARTIKEL LAINNYA
+                    // SETELAH ARTIKEL UTAMA MUNCUL, PANGGIL FUNGSI LAINNYA
                     muatArtikelLainnya(idArtikel);
+                    muatKomentar(idArtikel); // Panggil fungsi muat komentar
 
                 } else {
                     wadahArtikel.innerHTML = '<div class="alert alert-warning">Maaf, artikel ini sudah dihapus atau tidak tersedia.</div>';
@@ -313,6 +339,104 @@
                 wadahArtikelLainnya.innerHTML = '';
             }
         }
+
+        if(jumlahDitampilkan === 0) {
+                    wadahArtikelLainnya.innerHTML = '<div class="col-12"><p class="text-muted">Belum ada artikel lainnya.</p></div>';
+                }
+
+            } catch (e) {
+                console.error("Gagal muat rekomendasi: ", e);
+                wadahArtikelLainnya.innerHTML = '';
+            }
+        }
+
+        // ================= FUNGSI BARU: MESIN KOMENTAR =================
+        async function muatKomentar(idSaatIni) {
+            const wadahKomen = document.getElementById("wadahKomentar");
+            try {
+                // Cari komentar yang ID Artikelnya sama dengan yang sedang dibaca
+                const q = query(collection(db, "komentar"), where("idArtikel", "==", idSaatIni));
+                const snapshot = await getDocs(q);
+                
+                let dataKomen = [];
+                snapshot.forEach(doc => dataKomen.push(doc.data()));
+
+                if (dataKomen.length === 0) {
+                    wadahKomen.innerHTML = '<div class="alert alert-light text-muted small text-center"><i class="fas fa-leaf mb-2 d-block fa-2x"></i> Belum ada tanggapan. Jadilah yang pertama berkomentar!</div>';
+                    return;
+                }
+
+                // Urutkan komentar dari yang paling baru (di atas) menggunakan Javascript
+                dataKomen.sort((a, b) => {
+                    let waktuA = a.tanggal ? a.tanggal.toMillis() : Date.now();
+                    let waktuB = b.tanggal ? b.tanggal.toMillis() : Date.now();
+                    return waktuB - waktuA;
+                });
+
+                wadahKomen.innerHTML = "";
+                dataKomen.forEach(k => {
+                    // Cek waktu
+                    let waktuTampil = "Baru saja";
+                    if (k.tanggal && typeof k.tanggal.toDate === 'function') {
+                        waktuTampil = k.tanggal.toDate().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    }
+                    
+                    wadahKomen.innerHTML += `
+                        <div class="d-flex mb-3 pb-3 border-bottom">
+                            <div class="me-3">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold text-uppercase" style="width: 45px; height: 45px; font-size: 1.2rem;">
+                                    ${k.nama.charAt(0)}
+                                </div>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">${k.nama}</h6>
+                                <small class="text-muted d-block mb-2"><i class="far fa-clock me-1"></i> ${waktuTampil}</small>
+                                <p class="mb-0 text-dark" style="font-size: 0.95rem;">${k.isi}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+            } catch (error) {
+                console.error("Gagal muat komentar", error);
+                wadahKomen.innerHTML = '<div class="text-danger small">Gagal memuat komentar.</div>';
+            }
+        }
+
+        // FUNGSI KIRIM KOMENTAR
+        // Karena form di-inject setelah artikel dimuat, kita harus pakai event delegation atau attach event ke document
+        document.addEventListener('submit', async function(e) {
+            if(e.target && e.target.id === 'formKomentar') {
+                e.preventDefault();
+                const btnKirim = document.getElementById("btnKirimKomen");
+                const nama = document.getElementById("namaKomen").value;
+                const isi = document.getElementById("isiKomen").value;
+                
+                btnKirim.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Mengirim...';
+                btnKirim.disabled = true;
+
+                try {
+                    await addDoc(collection(db, "komentar"), {
+                        idArtikel: idArtikel,
+                        nama: nama,
+                        isi: isi,
+                        tanggal: serverTimestamp()
+                    });
+                    
+                    // Sukses! Bersihkan form dan muat ulang list komentar
+                    document.getElementById("formKomentar").reset();
+                    muatKomentar(idArtikel);
+                    
+                } catch (error) {
+                    console.error("Error kirim komen: ", error);
+                    alert("Gagal mengirim komentar. Pastikan internet lancar atau aturan Firebase sudah dibuka.");
+                } finally {
+                    btnKirim.innerHTML = '<i class="fas fa-paper-plane me-1"></i> Kirim Tanggapan';
+                    btnKirim.disabled = false;
+                }
+            }
+        });
+        // ===============================================================
 
         // Jalankan fungsi
         document.addEventListener("DOMContentLoaded", muatArtikelPenuh);
