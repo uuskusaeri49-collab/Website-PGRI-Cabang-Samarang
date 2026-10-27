@@ -502,8 +502,9 @@
                         icon = "fa-bullhorn"; 
                     }
 
-                    // Buat cuplikan isi berita (maksimal 100 huruf agar rapi)
-                    const isiPendek = data.isi.length > 100 ? data.isi.substring(0, 100) + "..." : data.isi;
+                    // INI YANG DIPERBAIKI: Hapus kode HTML tersembunyi sebelum dipotong
+                    let teksMentah = data.isi.replace(/<[^>]*>?/gm, '');
+                    const isiPendek = teksMentah.length > 100 ? teksMentah.substring(0, 100) + "..." : teksMentah;
 
                     // Mengecek apakah postingan ini punya gambar atau tidak
                     // Kalau tidak ada, pakai gambar default logo PGRI abu-abu
