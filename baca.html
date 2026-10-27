@@ -180,24 +180,35 @@
             }
 
             try {
+                // Tunjuk ke dokumen spesifik di koleksi "postingan"
                 const docRef = doc(db, "postingan", idArtikel);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     
-                    // JURUS ILUSI META TAGS
-                    document.title = data.judul + " - PGRI Samarang";
-                    let teksDeskripsi = data.isi.replace(/<[^>]*>?/gm, ''); 
+                    // ANTI-ERROR: Beri 'Ban Serep' kalau ada data yang kosong/hilang di Firebase
+                    const judulAman = data.judul || "Tanpa Judul";
+                    const isiAman = data.isi || "<p><i>Tidak ada deskripsi tambahan.</i></p>";
+                    const penulisAman = data.penulis || "Admin PGRI";
+                    const kategoriAman = data.kategori || "Umum";
+                    
+                    // JURUS ILUSI: UBAH TITLE DAN META TAGS SECARA OTOMATIS
+                    document.title = judulAman + " - PGRI Samarang";
+                    
+                    // Buat cuplikan teks pendek untuk deskripsi
+                    let teksDeskripsi = isiAman.replace(/<[^>]*>?/gm, ''); // Hapus kode HTML dari teks
                     teksDeskripsi = teksDeskripsi.length > 100 ? teksDeskripsi.substring(0, 100) + "..." : teksDeskripsi;
 
-                    document.getElementById('metaOgTitle').setAttribute("content", data.judul);
+                    // Ubah meta tags di bagian <head>
+                    document.getElementById('metaOgTitle').setAttribute("content", judulAman);
                     document.getElementById('metaOgDesc').setAttribute("content", teksDeskripsi);
+                    
                     if (data.gambar) {
                         document.getElementById('metaOgImage').setAttribute("content", data.gambar);
                     }
 
-                    // Format tanggal 
+                    // Format tanggal yang aman dari error (Safe Check)
                     let tanggalPosting = "Baru saja";
                     if (data.tanggalDibuat && typeof data.tanggalDibuat.toDate === 'function') {
                         const dateObj = data.tanggalDibuat.toDate();
@@ -215,42 +226,31 @@
                           <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="index.html" class="text-decoration-none">Beranda</a></li>
                             <li class="breadcrumb-item"><a href="berita.html" class="text-decoration-none">Berita</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">${data.kategori}</li>
+                            <li class="breadcrumb-item active" aria-current="page">${kategoriAman}</li>
                           </ol>
                         </nav>
                         
-                        <h1 class="article-title fw-bold mb-3 mt-2">${data.judul}</h1>
+                        <h1 class="article-title fw-bold mb-3 mt-2">${judulAman}</h1>
                         
                         <div class="d-flex align-items-center mb-4 pb-3 border-bottom text-muted">
                             <i class="fas fa-user-circle fa-2x me-2 text-primary"></i>
                             <div>
-                                <div class="fw-bold text-dark">${data.penulis}</div>
+                                <div class="fw-bold text-dark">${penulisAman}</div>
                                 <small><i class="far fa-calendar-alt me-1"></i> Dipublikasikan pada ${tanggalPosting}</small>
                             </div>
                         </div>
 
                         ${elemenGambarBaca}
 
-                        <div class="article-content">${data.isi}</div>
+                        <div class="article-content">${isiAman}</div>
                         
                         <div class="mt-5 pt-4 border-top">
                             <h6 class="fw-bold mb-3">Bagikan Artikel Ini:</h6>
-                            <button class="btn btn-sm btn-outline-success me-2 rounded-pill px-3" onclick="window.open('https://api.whatsapp.com/send?text=${encodeURIComponent(data.judul + ' | Baca selengkapnya di: ' + window.location.href)}', '_blank')"><i class="fab fa-whatsapp me-1"></i> WhatsApp</button>
+                            <button class="btn btn-sm btn-outline-success me-2 rounded-pill px-3" onclick="window.open('https://api.whatsapp.com/send?text=${encodeURIComponent(judulAman + ' | Baca selengkapnya di: ' + window.location.href)}', '_blank')"><i class="fab fa-whatsapp me-1"></i> WhatsApp</button>
                             <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}', '_blank')"><i class="fab fa-facebook me-1"></i> Facebook</button>
                         </div>
 
-                        <!-- RUANG DISKUSI / KOMENTAR -->
-                        <div class="mt-5 pt-4 border-top">
-                            <h4 class="fw-bold mb-4"><i class="fas fa-comments text-primary me-2"></i> Ruang Diskusi</h4>
-                            <div id="wadahKomentar" class="mb-4">
-                                <div class="text-center text-muted py-3"><i class="fas fa-spinner fa-spin me-2"></i>Memuat komentar...</div>
-                            </div>
-                            <div class="card card-custom bg-light border-0 p-4">
-                                <h6 class="fw-bold mb-3">Tinggalkan Jejak / Tanggapan</h6>
-                                <form id="formKomentar">
-                                    <div class="mb-3">
-                                        <input type="text" id="namaKomen" class="form-control" placeholder="Nama Anda (Boleh diisi dengan nama & asal sekolah)" required>
-                                    </div>
+                        <!-- ================= FITUR BARU: KOLOM KOMENTAR ================= -->
                                     <div class="mb-3">
                                         <textarea id="isiKomen" class="form-control" rows="3" placeholder="Tulis komentar membangun di sini..." required></textarea>
                                     </div>
