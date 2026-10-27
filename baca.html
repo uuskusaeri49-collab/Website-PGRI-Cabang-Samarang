@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baca Artikel - PGRI Cabang Samarang</title>
+    
+    <!-- KTP SOSIAL MEDIA (Standar Awal sebelum diubah oleh Javascript) -->
+    <meta property="og:title" id="metaOgTitle" content="Artikel PGRI Cabang Samarang">
+    <meta property="og:description" id="metaOgDesc" content="Baca selengkapnya artikel dan publikasi dari PGRI Cabang Samarang.">
+    <meta property="og:image" id="metaOgImage" content="https://uuskusaeri49-collab.github.io/Website-PGRI-Cabang-Samarang/logo-pgri.jpg">
+    <meta property="og:type" content="article">
+    
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -197,6 +204,21 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     
+                    // JURUS ILUSI: UBAH TITLE DAN META TAGS SECARA OTOMATIS
+                    document.title = data.judul + " - PGRI Samarang";
+                    
+                    // Buat cuplikan teks pendek untuk deskripsi
+                    let teksDeskripsi = data.isi.replace(/<[^>]*>?/gm, ''); // Hapus kode HTML dari teks
+                    teksDeskripsi = teksDeskripsi.length > 100 ? teksDeskripsi.substring(0, 100) + "..." : teksDeskripsi;
+
+                    // Ubah meta tags di bagian <head>
+                    document.getElementById('metaOgTitle').setAttribute("content", data.judul);
+                    document.getElementById('metaOgDesc').setAttribute("content", teksDeskripsi);
+                    
+                    if (data.gambar) {
+                        document.getElementById('metaOgImage').setAttribute("content", data.gambar);
+                    }
+
                     // Format tanggal yang aman dari error (Safe Check)
                     let tanggalPosting = "Baru saja";
                     if (data.tanggalDibuat && typeof data.tanggalDibuat.toDate === 'function') {
